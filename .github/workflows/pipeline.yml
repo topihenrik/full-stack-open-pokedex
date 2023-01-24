@@ -59,27 +59,27 @@ jobs:
 #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #        DEFAULT_BUMP: patch
 #        WITH_V: true
-notify:
-  needs: [simple_deployment_pipeline]
-  steps:
-    - name: Info
-      uses: rjstone/discord-webhook-notify@v1
-      if: success()
-      with:
-        severity: info
-        details: CI succeeded.
-        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-    - name: Warn
-      uses: rjstone/discord-webhook-notify@v1
-      if: cancelled()
-      with:
-        severity: warn
-        details: CI warning.
-        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-    - name: Error
-      uses: rjstone/discord-webhook-notify@v1
-      if: failure()
-      with:
-        severity: error
-        details: CI error.
-        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+  notify:
+    needs: [simple_deployment_pipeline]
+    steps:
+      - name: Info
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
+        with:
+          severity: info
+          details: CI succeeded.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Warn
+        uses: rjstone/discord-webhook-notify@v1
+        if: cancelled()
+        with:
+          severity: warn
+          details: CI warning.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Error
+        uses: rjstone/discord-webhook-notify@v1
+        if: failure()
+        with:
+          severity: error
+          details: CI error.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
