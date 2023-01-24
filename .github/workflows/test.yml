@@ -25,5 +25,5 @@ jobs:
       - name: test stuff
         env:
             COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-        if: contains('#skip', github.event.commits.*.message)
+        if: contains(github.event.commits.*.message, '#skip')
         run: echo 'Went through!'
