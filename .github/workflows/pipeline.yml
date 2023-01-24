@@ -41,6 +41,7 @@ jobs:
       #- uses: superfly/flyctl-actions/setup-flyctl@master
       #- run: flyctl deploy --remote-only
   tag_release:
+    permissions: write-all
     name: Tag release
     #needs: [deploy]
     if: ${{ github.event_name == 'push' }}
