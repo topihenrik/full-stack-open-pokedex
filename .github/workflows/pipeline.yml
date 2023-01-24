@@ -31,36 +31,34 @@ jobs:
           command: npm run test:e2e
           start: npm run start-prod
           wait-on: http://localhost:5000
-
-      
-#  deploy:
-#    name: Deploy app
-#    needs: [simple_deployment_pipeline]
-#    if: ${{ (github.event_name == 'push') && (!contains(toJson(github.event.commits.*.message), '#skip')) }}
-#    runs-on: ubuntu-20.04
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: superfly/flyctl-actions/setup-flyctl@master
-#      - run: flyctl deploy --remote-only
-#  tag_release:
-#    permissions: write-all
-#    name: Tag release
-#    needs: [deploy]
-#    if: ${{ github.event_name == 'push' }}
-#    runs-on: ubuntu-20.04
-#    steps:
-#    - uses: actions/checkout@v3
-#      with:
-#        ref: ${{ github.sha }}
-#        fetch-depth: '0'
-#    - name: Bump version and push tag
-#      uses: anothrNick/github-tag-action@1.55.0
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        DEFAULT_BUMP: patch
-#        WITH_V: true
-  notify:
+  deploy:
+    name: Deploy app
     needs: [simple_deployment_pipeline]
+    if: ${{ (github.event_name == 'push') && (!contains(toJson(github.event.commits.*.message), '#skip')) }}
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+  tag_release:
+    permissions: write-all
+    name: Tag release
+    needs: [deploy]
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: '0'
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.55.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BUMP: patch
+        WITH_V: true
+  notify:
+    needs: [tag_release]
     runs-on: ubuntu-20.04
     steps:
       - name: Info
@@ -68,19 +66,19 @@ jobs:
         if: success()
         with:
           severity: info
-          details: CI succeeded.
+          details: New version of POKEDEX deployed.
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Warn
         uses: rjstone/discord-webhook-notify@v1
         if: cancelled()
         with:
           severity: warn
-          details: CI warning.
+          details: CI pipeline cancelled.
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Error
         uses: rjstone/discord-webhook-notify@v1
         if: failure()
         with:
           severity: error
-          details: CI error.
+          details: CI pipeline failed. 
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
