@@ -61,6 +61,7 @@ jobs:
 #        WITH_V: true
   notify:
     needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-20.04
     steps:
       - name: Info
         uses: rjstone/discord-webhook-notify@v1
